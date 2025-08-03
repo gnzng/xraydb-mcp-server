@@ -1,7 +1,6 @@
 # XrayDB MCP Server
 
-
-Prototype of a Model Context Protocol (MCP) server that provides access to X-ray properties of elements via the xraydb library.
+Prototype of a Model Context Protocol (MCP) server that provides access to X-ray properties of elements via the [xraydb](https://github.com/xraypy/XrayDB) library.
 
 So far implemented:
 - `xraydb.xray_edges(element)` 
