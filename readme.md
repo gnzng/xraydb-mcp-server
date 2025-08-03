@@ -9,6 +9,7 @@ Cool is that this repo/server has only 2 `pip` installable dependencies:
 
 So far implemented:
 - `xraydb.xray_edges(element)` 
+- `xraydb.guess_edge(energy)`
 
 ## Showcase
 
@@ -18,5 +19,9 @@ Showcased using [goose](https://github.com/block/goose/) with the free horizon-b
 
 It is relatively typing error agnostic too:
 
-![Goose Tyoi](static/goose_typos.png)
+![Goose Typo](static/goose_typos.png)
 
+It can also suggest an element an corresponding edge for an energy:
+
+
+![Goose guess_edge](static/goose_guess_edge.png)
