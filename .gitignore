@@ -1,0 +1,53 @@
+# Python typical ignores
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.pyo
+*.pyd
+*.env
+*.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+*.egg
+*.egg-info/
+dist/
+build/
+*.log
+*.sqlite3
+
+# MCP specific ignores
+mcp.db
+mcp.log
+mcp_server.log
+*.mcp_cache
+*.mcp_tmp
+mcp_config.json
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# Test and coverage
+.coverage
+htmlcov/
+*.cover
+*.py,cover
+.cache
+nosetests.xml
+coverage.xml
+*.mo
+*.pot
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Others
+*.swp
+*.swo
