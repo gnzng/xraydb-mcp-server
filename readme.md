@@ -24,3 +24,7 @@ It is relatively typing error agnostic too:
 It can also suggest an element an corresponding edge for an energy:
 
 ![Goose guess_edge](static/goose_guess_edge.png)
+
+It runs local using a 0.5B qwen2.5 (ca. 400MB) model with ollama: 
+
+![Goose ollama](static/goose_ollama.png)
