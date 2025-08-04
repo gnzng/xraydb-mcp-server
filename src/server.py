@@ -84,8 +84,9 @@ async def handle_call_tool(
             if not isinstance(energy, (int, float)):
                 raise ValueError("Energy must be a number")
 
+            used_edges = ("K", "L3", "L2", "L1", "M4", "M5")
             # Get elements around the edge energy
-            elements = xraydb.guess_edge(energy)
+            elements = xraydb.guess_edge(energy, edges=used_edges)
             if not elements:
                 return [
                     types.TextContent(
@@ -100,9 +101,10 @@ async def handle_call_tool(
                 types.TextContent(
                     type="text",
                     text=f"Absorption edge near {energy} eV:\n\n"
-                    + f"Element: {element_tuple[0].upper()}\n"
+                    + f"Element: {element_tuple[0].capitalize()}\n"
                     + f"Edge: {element_tuple[1]}\n"
-                    + f"Exact energy: {xraydb.xray_edge(element_tuple[0], element_tuple[1]).energy:.1f} eV\n",
+                    + f"Exact energy: {xraydb.xray_edge(element_tuple[0], element_tuple[1]).energy:.1f} eV\n"
+                    + f"Looked for absorption edges: {', '.join(used_edges)}\n",
                 )
             ]
 
