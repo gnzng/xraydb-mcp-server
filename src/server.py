@@ -17,7 +17,7 @@ async def handle_list_tools() -> list[types.Tool]:
     return [
         types.Tool(
             name="xray_edges",
-            description="Get X-ray absorption edges for an element in eV and fyields and jump ratios",
+            description="Get X-ray absorption edges for an element in eV.",
             inputSchema={
                 "type": "object",
                 "properties": {
@@ -58,12 +58,21 @@ async def handle_call_tool(
             if not element:
                 raise ValueError("Missing element parameter")
             edges = xraydb.xray_edges(element)
-            # Convert to string representation which handles the formatting
-            edge_text = str(edges)
+
+            # Format as a readable table
+            formatted_output = f"X-ray absorption edges for {element.capitalize()}:\n\n"
+            formatted_output += (
+                "Edge    Energy (eV)    Fluorescence Yield    Jump Ratio\n"
+            )
+            formatted_output += "-" * 55 + "\n"
+
+            for edge_name, edge_data in edges.items():
+                formatted_output += f"{edge_name:<6} {edge_data.energy:>10.1f} {edge_data.fyield:>18.6f} {edge_data.jump_ratio:>12.3f}\n"
+
             return [
                 types.TextContent(
                     type="text",
-                    text=f"X-ray absorption edges for {element} with energy in eV:\n{edge_text}",
+                    text=formatted_output,
                 )
             ]
 
@@ -86,10 +95,14 @@ async def handle_call_tool(
                 ]
 
             element_tuple = elements
+
             return [
                 types.TextContent(
                     type="text",
-                    text=f"Absorption edges around the energy {energy} eV, Element {element_tuple[0]} at absorption edge {element_tuple[1]}.",
+                    text=f"Absorption edge near {energy} eV:\n\n"
+                    + f"Element: {element_tuple[0].upper()}\n"
+                    + f"Edge: {element_tuple[1]}\n"
+                    + f"Exact energy: {xraydb.xray_edge(element_tuple[0], element_tuple[1]).energy:.1f} eV\n",
                 )
             ]
 
@@ -97,9 +110,7 @@ async def handle_call_tool(
             raise ValueError(f"Unknown tool: {name}")
 
     except Exception as e:
-        return [
-            types.TextContent(type="text", text=f"Error processing {element}: {str(e)}")
-        ]
+        return [types.TextContent(type="text", text=f"Error processing: {str(e)}")]
 
 
 async def main():

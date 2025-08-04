@@ -23,5 +23,4 @@ It is relatively typing error agnostic too:
 
 It can also suggest an element an corresponding edge for an energy:
 
-
 ![Goose guess_edge](static/goose_guess_edge.png)
