@@ -132,6 +132,40 @@ async def tool_atomic_number(arguments):
     ]
 
 
+@register_tool(
+    name="atomic_density",
+    description="Return the atomic density (gr/cm^3) for an element. Given element symbol (e.g., 'Fe', 'Cu').",
+    inputSchema={
+        "type": "object",
+        "properties": {
+            "element": {
+                "type": "string",
+                "description": "Element symbol (e.g., 'Fe', 'Cu') or name",
+            },
+        },
+        "required": ["element"],
+    },
+)
+async def tool_atomic_density(arguments):
+    element = arguments.get("element")
+    if not element:
+        raise ValueError("Missing element parameter")
+    atomic_density = xraydb.atomic_density(element)
+    if atomic_density is None:
+        return [
+            types.TextContent(
+                type="text",
+                text=f"Unknown element: {element}",
+            )
+        ]
+    return [
+        types.TextContent(
+            type="text",
+            text=f"Atomic density of {element.capitalize()} is {atomic_density:.2f} g/cm^3.",
+        )
+    ]
+
+
 @server.list_tools()
 async def handle_list_tools() -> list[types.Tool]:
     """List available tools systematically."""
