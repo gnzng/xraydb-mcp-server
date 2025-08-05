@@ -98,6 +98,40 @@ async def tool_guess_edge(arguments):
     ]
 
 
+@register_tool(
+    name="atomic_number",
+    description="Return the atomic number Z for an element.",
+    inputSchema={
+        "type": "object",
+        "properties": {
+            "element": {
+                "type": "string",
+                "description": "Element symbol (e.g., 'Fe', 'Cu') or name",
+            },
+        },
+        "required": ["element"],
+    },
+)
+async def tool_atomic_number(arguments):
+    element = arguments.get("element")
+    if not element:
+        raise ValueError("Missing element parameter")
+    atomic_number = xraydb.atomic_number(element)
+    if atomic_number is None:
+        return [
+            types.TextContent(
+                type="text",
+                text=f"Unknown element: {element}",
+            )
+        ]
+    return [
+        types.TextContent(
+            type="text",
+            text=f"Atomic number of {element.capitalize()} is {atomic_number}.",
+        )
+    ]
+
+
 @server.list_tools()
 async def handle_list_tools() -> list[types.Tool]:
     """List available tools systematically."""
