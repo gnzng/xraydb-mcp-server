@@ -166,6 +166,125 @@ async def tool_atomic_density(arguments):
     ]
 
 
+@register_tool(
+    name="mirror_reflectivity",
+    description="Calculate mirror reflectivity for a thick, single-layer mirror.",
+    inputSchema={
+        "type": "object",
+        "properties": {
+            "formula": {
+                "type": "string",
+                "description": "Material name or formula (e.g., 'Si', 'Rh', 'silicon')",
+            },
+            "theta": {
+                "type": "number",
+                "description": "Mirror angle in radians",
+            },
+            "energy": {
+                "type": "number",
+                "description": "X-ray energy in eV",
+            },
+            "density": {
+                "type": ["number", "null"],
+                "description": "Material density in g/cm^3 (optional)",
+                "default": None,
+            },
+            "roughness": {
+                "type": "number",
+                "description": "Mirror roughness in Angstroms (default: 0.0)",
+                "default": 0.0,
+            },
+            "polarization": {
+                "type": "string",
+                "enum": ["s", "p"],
+                "description": "Mirror orientation relative to X-ray polarization (default: 's')",
+                "default": "s",
+            },
+            "output": {
+                "type": "string",
+                "enum": ["intensity", "amplitude"],
+                "description": "Output type: intensity or complex amplitude (default: 'intensity')",
+                "default": "intensity",
+            },
+        },
+        "required": ["formula", "theta", "energy"],
+    },
+)
+async def tool_mirror_reflectivity(arguments):
+    formula = arguments.get("formula")
+    theta = arguments.get("theta")
+    energy = arguments.get("energy")
+    density = arguments.get("density", None)
+    roughness = arguments.get("roughness", 0.0)
+    polarization = arguments.get("polarization", "s")
+    output = arguments.get("output", "intensity")
+
+    if formula is None or theta is None or energy is None:
+        raise ValueError("Missing required parameters: formula, theta, or energy")
+
+    import inspect
+
+    try:
+        sig = inspect.signature(xraydb.mirror_reflectivity)
+        if (
+            "output" in sig.parameters
+            and sig.parameters["output"].kind == inspect.Parameter.KEYWORD_ONLY
+        ):
+            # output is keyword-only
+            reflectivity = xraydb.mirror_reflectivity(
+                formula,
+                theta,
+                energy,
+                density=density,
+                roughness=roughness,
+                polarization=polarization,
+                output=output,
+            )
+        elif "output" in sig.parameters:
+            # output is positional or can be keyword
+            reflectivity = xraydb.mirror_reflectivity(
+                formula, theta, energy, density, roughness, polarization, output
+            )
+        else:
+            # fallback: don't pass output
+            reflectivity = xraydb.mirror_reflectivity(
+                formula, theta, energy, density, roughness, polarization
+            )
+        if reflectivity is None:
+            return [
+                types.TextContent(
+                    type="text",
+                    text=(
+                        "Error calculating mirror reflectivity: No result returned. "
+                        "This may be due to an invalid material formula, density, or other input. "
+                        f"Inputs: formula={formula}, theta={theta}, energy={energy}, density={density}, roughness={roughness}, polarization={polarization}, output={output}"
+                    ),
+                )
+            ]
+    except Exception as e:
+        return [
+            types.TextContent(
+                type="text",
+                text=f"Error calculating mirror reflectivity: {str(e)}",
+            )
+        ]
+
+    result_type = "Intensity" if output == "intensity" else "Complex amplitude"
+    return [
+        types.TextContent(
+            type="text",
+            text=(
+                f"Mirror reflectivity for {formula} at theta={theta} rad, energy={energy} eV:\n"
+                f"Density: {density if density is not None else 'default'} g/cm^3\n"
+                f"Roughness: {roughness} Å\n"
+                f"Polarization: {polarization}\n"
+                f"Output type: {result_type}\n"
+                f"Reflectivity: {reflectivity}"
+            ),
+        )
+    ]
+
+
 @server.list_tools()
 async def handle_list_tools() -> list[types.Tool]:
     """List available tools systematically."""
