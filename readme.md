@@ -8,9 +8,14 @@ Cool is that this repo/server has only 2 `pip` installable dependencies:
 
 
 So far implemented:
-- `xraydb.xray_edges(element)` 
-- `xraydb.guess_edge(energy)`
-- 
+
+- xraydb.xray_edges(element)
+- xraydb.guess_edge(energy, edges=used_edges)
+- xraydb.xray_edge(...)
+- xraydb.atomic_number(element)
+- xraydb.atomic_density(element)
+- xraydb.mirror_reflectivity(...)
+- xraydb.multilayer_reflectivity(...)
 
 ## Showcase
 
