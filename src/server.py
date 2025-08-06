@@ -285,6 +285,183 @@ async def tool_mirror_reflectivity(arguments):
     ]
 
 
+@register_tool(
+    name="multilayer_reflectivity",
+    description=(
+        "Calculate reflectivity for a multilayer mirror stack. "
+        "Given a stackup (list of material formulas, e.g., ['Mo', 'Si']), thicknesses (list of layer thicknesses in Angstroms), "
+        "and substrate (material name or formula), computes the X-ray reflectivity for a multilayer mirror. "
+        "Supports specifying the number of periods (n_periods), densities for each layer (density, optional), substrate density (optional), "
+        "substrate and surface roughness (in Angstroms), polarization ('s' or 'p'), and output type ('intensity' or 'amplitude'). "
+        "Only one of theta or energy can be an array. Densities can be None for known materials or a list matching the stackup. "
+        "Polarization 's' means X-ray polarization along the mirror surface (vertically deflecting), 'p' means normal to the surface (horizontally deflecting)."
+    ),
+    inputSchema={
+        "type": "object",
+        "properties": {
+            "stackup": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": (
+                    "List of material formulas for the multilayer stack (e.g., ['Mo', 'Si']). "
+                    "Each entry should be a valid material name or chemical formula."
+                ),
+            },
+            "thickness": {
+                "type": "array",
+                "items": {"type": "number"},
+                "description": (
+                    "List of layer thicknesses in Angstroms, one per material in stackup. "
+                    "Length must match stackup."
+                ),
+            },
+            "substrate": {
+                "type": "string",
+                "description": (
+                    "Substrate material name or formula (e.g., 'Si', 'silicon'). "
+                    "Used as the base layer for the mirror."
+                ),
+            },
+            "theta": {
+                "type": "number",
+                "description": (
+                    "Mirror angle in radians. Only one of theta or energy can be an array."
+                ),
+            },
+            "energy": {
+                "type": "number",
+                "description": (
+                    "X-ray energy in eV. Only one of theta or energy can be an array."
+                ),
+            },
+            "n_periods": {
+                "type": "integer",
+                "description": (
+                    "Number of periods in the multilayer stack (default: 1). "
+                    "Each period repeats the stackup and thickness sequence."
+                ),
+                "default": 1,
+            },
+            "density": {
+                "type": ["array", "null"],
+                "items": {"type": "number"},
+                "description": (
+                    "Material densities in g/cm^3 for each layer in stackup (optional). "
+                    "If None, uses default density for known materials. "
+                    "Length must match stackup."
+                ),
+                "default": None,
+            },
+            "substrate_density": {
+                "type": ["number", "null"],
+                "description": (
+                    "Density of substrate in g/cm^3 (optional). "
+                    "If None, uses default density for known substrate materials."
+                ),
+                "default": None,
+            },
+            "substrate_rough": {
+                "type": "number",
+                "description": (
+                    "Substrate roughness in Angstroms (default: 0.0). "
+                    "Affects reflectivity at the substrate interface."
+                ),
+                "default": 0.0,
+            },
+            "surface_rough": {
+                "type": "number",
+                "description": (
+                    "Surface roughness in Angstroms (default: 0.0). "
+                    "Affects reflectivity at the top surface."
+                ),
+                "default": 0.0,
+            },
+            "polarization": {
+                "type": "string",
+                "enum": ["s", "p"],
+                "description": (
+                    "Mirror orientation relative to X-ray polarization (default: 's'). "
+                    "'s': polarization along mirror surface (vertically deflecting); "
+                    "'p': polarization normal to surface (horizontally deflecting)."
+                ),
+                "default": "s",
+            },
+            "output": {
+                "type": "string",
+                "enum": ["intensity", "amplitude"],
+                "description": (
+                    "Output type: 'intensity' for reflectivity values, "
+                    "'amplitude' for complex amplitude (default: 'intensity')."
+                ),
+                "default": "intensity",
+            },
+        },
+        "required": ["stackup", "thickness", "substrate", "theta", "energy"],
+    },
+)
+async def tool_multilayer_reflectivity(arguments):
+    stackup = arguments.get("stackup")
+    thickness = arguments.get("thickness")
+    substrate = arguments.get("substrate")
+    theta = arguments.get("theta")
+    energy = arguments.get("energy")
+    n_periods = arguments.get("n_periods", 1)
+    density = arguments.get("density", None)
+    substrate_density = arguments.get("substrate_density", None)
+    substrate_rough = arguments.get("substrate_rough", 0.0)
+    surface_rough = arguments.get("surface_rough", 0.0)
+    polarization = arguments.get("polarization", "s")
+    output = arguments.get("output", "intensity")
+
+    # Validate required arguments
+    if not (isinstance(stackup, list) and isinstance(thickness, list)):
+        raise ValueError("stackup and thickness must be lists")
+    if len(stackup) != len(thickness):
+        raise ValueError("stackup and thickness must be the same length")
+
+    try:
+        reflectivity = xraydb.multilayer_reflectivity(
+            stackup,
+            thickness,
+            substrate,
+            theta,
+            energy,
+            n_periods=n_periods,
+            density=density,
+            substrate_density=substrate_density,
+            substrate_rough=substrate_rough,
+            surface_rough=surface_rough,
+            polarization=polarization,
+            output=output,
+        )
+    except Exception as e:
+        return [
+            types.TextContent(
+                type="text",
+                text=f"Error calculating multilayer reflectivity: {str(e)}",
+            )
+        ]
+
+    result_type = "Intensity" if output == "intensity" else "Complex amplitude"
+    return [
+        types.TextContent(
+            type="text",
+            text=(
+                f"Multilayer reflectivity for stackup {stackup} with thicknesses {thickness} Å, "
+                f"substrate={substrate}, theta={theta} rad, energy={energy} eV:\n"
+                f"n_periods: {n_periods}\n"
+                f"Density: {density if density is not None else 'default'}\n"
+                f"Substrate density: {substrate_density if substrate_density is not None else 'default'}\n"
+                f"Substrate roughness: {substrate_rough} Å\n"
+                f"Surface roughness: {surface_rough} Å\n"
+                f"Polarization: {polarization}\n"
+                f"Output type: {result_type}\n"
+                f"Reflectivity: {reflectivity}"
+            ),
+        )
+    ]
+
+
 @server.list_tools()
 async def handle_list_tools() -> list[types.Tool]:
     """List available tools systematically."""
