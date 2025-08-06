@@ -1,3 +1,6 @@
+# .gitignore for xraydb-mcp-server
+startup.sh
+
 # Python typical ignores
 __pycache__/
 *.py[cod]
