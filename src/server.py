@@ -7,6 +7,8 @@ import mcp.types as types
 from mcp.server import NotificationOptions, Server
 import mcp.server.stdio
 import xraydb
+import inspect
+
 
 # Create server instance
 server = Server("xraydb-server")
@@ -222,8 +224,6 @@ async def tool_mirror_reflectivity(arguments):
 
     if formula is None or theta is None or energy is None:
         raise ValueError("Missing required parameters: formula, theta, or energy")
-
-    import inspect
 
     try:
         sig = inspect.signature(xraydb.mirror_reflectivity)
