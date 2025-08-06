@@ -462,6 +462,64 @@ async def tool_multilayer_reflectivity(arguments):
     ]
 
 
+@register_tool(
+    name="material_mu",
+    description="X-ray attenuation length (in 1/cm) for a material by name or formula. Uses mu_elam().",
+    inputSchema={
+        "type": "object",
+        "properties": {
+            "name_or_formula": {
+                "type": "string",
+                "description": "Chemical formula or material name (e.g., 'H2O', 'Si', 'silicon').",
+            },
+            "energy": {
+                "type": "number",
+                "description": "X-ray energy in eV.",
+            },
+            "density": {
+                "type": ["number", "null"],
+                "description": "Material density in g/cm^3 (optional). If None, uses default for known materials.",
+                "default": None,
+            },
+            "kind": {
+                "type": "string",
+                "enum": ["photo", "total"],
+                "description": "Return photo-absorption or total cross-section ('total' by default).",
+                "default": "total",
+            },
+        },
+        "required": ["name_or_formula", "energy"],
+    },
+)
+async def tool_material_mu(arguments):
+    name_or_formula = arguments.get("name_or_formula")
+    energy = arguments.get("energy")
+    density = arguments.get("density", None)
+    kind = arguments.get("kind", "total")
+    if name_or_formula is None or energy is None:
+        raise ValueError("Missing required parameters: name_or_formula or energy")
+    try:
+        mu = xraydb.material_mu(name_or_formula, energy, density=density, kind=kind)
+    except Exception as e:
+        return [
+            types.TextContent(
+                type="text",
+                text=f"Error calculating material_mu: {str(e)}",
+            )
+        ]
+    return [
+        types.TextContent(
+            type="text",
+            text=(
+                f"X-ray attenuation length (mu) for material '{name_or_formula}' at {energy} eV:\n"
+                f"Density: {density if density is not None else 'default'} g/cm^3\n"
+                f"Kind: {kind}\n"
+                f"mu: {mu:.6f} 1/cm"
+            ),
+        )
+    ]
+
+
 @server.list_tools()
 async def handle_list_tools() -> list[types.Tool]:
     """List available tools systematically."""
