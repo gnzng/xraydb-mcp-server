@@ -10,8 +10,15 @@ Cool is that this repo/server has only 2 `pip` installable dependencies:
 So far implemented:
 - `xraydb.xray_edges(element)` 
 - `xraydb.guess_edge(energy)`
+- 
 
 ## Showcase
+
+
+More complicated multilayer reflectivity calculations are possible:
+
+![GPT-REFL](static/gpt-mll-refl.png)
+
 
 Showcased using [goose](https://github.com/block/goose/) with the free horizon-beta LLM accessed via openrouter.
 
