@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import math
 
 import asyncio
 from mcp.server.models import InitializationOptions
@@ -515,6 +516,50 @@ async def tool_material_mu(arguments):
                 f"Density: {density if density is not None else 'default'} g/cm^3\n"
                 f"Kind: {kind}\n"
                 f"mu: {mu:.6f} 1/cm"
+            ),
+        )
+    ]
+
+
+@register_tool(
+    name="lambert_beer",
+    description="Calculate X-ray transmission using the Lambert-Beer law: I = I0 * exp(-mu * thickness).",
+    inputSchema={
+        "type": "object",
+        "properties": {
+            "mu": {
+                "type": "number",
+                "description": "Linear attenuation coefficient (mu) in 1/cm.",
+            },
+            "thickness": {
+                "type": "number",
+                "description": "Sample thickness in cm.",
+            },
+            "I0": {
+                "type": "number",
+                "description": "Incident intensity (optional, default: 1.0).",
+                "default": 1.0,
+            },
+        },
+        "required": ["mu", "thickness"],
+    },
+)
+async def tool_lambert_beer(arguments):
+    mu = arguments.get("mu")
+    thickness = arguments.get("thickness")
+    I0 = arguments.get("I0", 1.0)
+    if mu is None or thickness is None:
+        raise ValueError("Missing required parameters: mu or thickness")
+    transmission = I0 * math.exp(-mu * thickness)
+    return [
+        types.TextContent(
+            type="text",
+            text=(
+                f"Lambert-Beer law calculation:\n"
+                f"mu = {mu} 1/cm\n"
+                f"thickness = {thickness} cm\n"
+                f"I0 = {I0}\n"
+                f"Transmitted intensity (I): {transmission:.6g}"
             ),
         )
     ]
