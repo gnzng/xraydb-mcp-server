@@ -57,18 +57,21 @@ def xray_edge(element: str, edge: str) -> str:
 
 
 @mcp.tool()
-def guess_edge(energy: float) -> str:
+def guess_edge(
+    energy: float, edges: tuple = ("K", "L3", "L2", "L1", "M4", "M5")
+) -> str:
     """
     Guesses the element and absorption edge based on the edge energy in eV.
     Args:
         energy (float): Edge energy in eV.
+        edges (tuple): Tuple of edge labels to consider (default: ("K", "L3", "L2", "L1", "M4", "M5")).
     Returns:
         str: Information about the element and absorption edge.
     """
     if not isinstance(energy, (int, float)):
         raise ValueError("Energy must be a number")
 
-    used_edges = ("K", "L3", "L2", "L1", "M4", "M5")
+    used_edges = edges
     elements = xraydb.guess_edge(energy, edges=used_edges)
 
     if not elements:
