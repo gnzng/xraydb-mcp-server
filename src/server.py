@@ -599,6 +599,79 @@ def xray_line(element: str, line: str) -> str:
         return f"Error retrieving X-ray emission line: {str(e)}"
 
 
+@mcp.tool()
+def coated_reflectivity(
+    coating: str,
+    coating_thick: float,
+    substrate: str,
+    theta: float,
+    energy: float,
+    coating_dens: Optional[float] = None,
+    surface_roughness: float = 0.0,
+    substrate_dens: Optional[float] = None,
+    substrate_roughness: float = 0.0,
+    binder: Optional[str] = None,
+    binder_thick: Optional[float] = None,
+    binder_dens: Optional[float] = None,
+    polarization: str = "s",
+    output: str = "intensity",
+) -> str:
+    """
+    Reflectivity for a coated mirror.
+    Args:
+        coating (str): Coating material name or formula.
+        coating_thick (float): Thickness of coating in Angstroms.
+        substrate (str): Substrate material name or formula.
+        theta (float): Mirror angle in radians.
+        energy (float): X-ray energy in eV.
+        coating_dens (Optional[float]): Density of mirror coating in g/cm^3.
+        surface_roughness (float): Coating roughness in Angstroms.
+        substrate_dens (Optional[float]): Density of substrate in g/cm^3.
+        substrate_roughness (float): Substrate roughness in Angstroms.
+        binder (Optional[str]): Binder material name or formula.
+        binder_thick (Optional[float]): Thickness of binder in Angstroms.
+        binder_dens (Optional[float]): Density of binder in g/cm^3.
+        polarization (str): Mirror orientation relative to X-ray polarization.
+        output (str): Output type: intensity or amplitude.
+    Returns:
+        str: Mirror reflectivity calculation results.
+    """
+    try:
+        if coating_thick is None:
+            raise ValueError("Please provide thickness of the coating in Angstroms")
+
+        stackup = [coating]
+        thickness = [coating_thick]
+        dens = coating_dens
+
+        if binder is not None:
+            if binder_thick is None:
+                raise ValueError(
+                    "Please provide thickness of binding layer in Angstroms"
+                )
+            stackup.append(binder)
+            thickness.append(binder_thick)
+            if binder_dens is not None:
+                dens = [coating_dens, binder_dens]
+
+        result = multilayer_reflectivity(
+            stackup,
+            thickness,
+            substrate,
+            theta,
+            energy,
+            density=dens,
+            substrate_density=substrate_dens,
+            substrate_rough=substrate_roughness,
+            surface_rough=surface_roughness,
+            polarization=polarization,
+            output=output,
+        )
+        return result
+    except Exception as e:
+        return f"Error calculating coated mirror reflectivity: {str(e)}"
+
+
 if __name__ == "__main__":
     # Run the MCP server
     mcp.run()
