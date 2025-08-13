@@ -722,6 +722,36 @@ def ionchamber_fluxes(
         return f"Error calculating ion chamber fluxes: {str(e)}"
 
 
+@mcp.tool()
+def dynamical_theta_offset(
+    energy: float,
+    crystal: str = "Si",
+    hkl: tuple = (1, 1, 1),
+    a: float = None,
+    m: int = 1,
+    polarization: str = "s",
+) -> str:
+    """
+    Angular offset from Bragg diffraction for a perfect single crystal.
+    Args:
+        energy (float): X-ray energy in eV
+        crystal (str): Name of crystal ('Si', 'Ge', or 'C')
+        hkl (tuple): h, k, l for reflection
+        a (float or None): Lattice constant (Angstroms)
+        m (int): Order of reflection
+        polarization (str): 's', 'p', 'u', or None
+    Returns:
+        str: Theta offset in radians
+    """
+    try:
+        theta_offset = xraydb.dynamical_theta_offset(
+            energy, crystal=crystal, hkl=hkl, a=a, m=m, polarization=polarization
+        )
+        return f"Theta offset: {theta_offset:.8g} radians"
+    except Exception as e:
+        return f"Error calculating dynamical theta offset: {str(e)}"
+
+
 if __name__ == "__main__":
     # Run the MCP server
     mcp.run()
