@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-import xraydb
-from mcp.server.fastmcp import FastMCP
-from typing import List, Optional
 import inspect
 import math
+from typing import List, Optional
+
+import xraydb
+from mcp.server.fastmcp import FastMCP
 
 mcp = FastMCP("xraydb-server")
 
