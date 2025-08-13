@@ -6,6 +6,7 @@ from typing import List, Optional
 import xraydb
 from mcp.server.fastmcp import FastMCP
 
+
 mcp = FastMCP("xraydb-server")
 
 
@@ -670,6 +671,55 @@ def coated_reflectivity(
         return result
     except Exception as e:
         return f"Error calculating coated mirror reflectivity: {str(e)}"
+
+
+@mcp.tool()
+def ionchamber_fluxes(
+    gas: str = "nitrogen",
+    volts: float = 1.0,
+    length: float = 100.0,
+    energy: float = 10000.0,
+    sensitivity: float = 1e-6,
+    sensitivity_units: str = "A/V",
+    with_compton: bool = True,
+    both_carriers: bool = True,
+) -> str:
+    """
+    Calculate ion chamber and PIN diode fluxes for a gas or mixture.
+    Args:
+        gas (str): Name or formula of fill gas (default: 'nitrogen').
+        volts (float): Measured voltage output of current amplifier.
+        length (float): Active length of ion chamber in cm.
+        energy (float): X-ray energy in eV.
+        sensitivity (float): Current amplifier sensitivity.
+        sensitivity_units (str): Units of current amplifier sensitivity.
+        with_compton (bool): Include Compton scattering contribution.
+        both_carriers (bool): Count both electron and ion current.
+    Returns:
+        str: Formatted string with fluxes.
+    """
+    try:
+        result = xraydb.ionchamber_fluxes(
+            gas=gas,
+            volts=volts,
+            length=length,
+            energy=energy,
+            sensitivity=sensitivity,
+            sensitivity_units=sensitivity_units,
+            with_compton=with_compton,
+            both_carriers=both_carriers,
+        )
+        output = (
+            f"Ion chamber fluxes for gas '{gas}' at {energy} eV, length={length} cm:\n"
+            f"Incident flux:    {result.incident:.6g} Hz\n"
+            f"Transmitted flux: {result.transmitted:.6g} Hz\n"
+            f"Photo flux:       {result.photo:.6g} Hz\n"
+            f"Incoherent flux:  {result.incoherent:.6g} Hz\n"
+            f"Coherent flux:    {getattr(result, 'coherent', 0.0):.6g} Hz"
+        )
+        return output
+    except Exception as e:
+        return f"Error calculating ion chamber fluxes: {str(e)}"
 
 
 if __name__ == "__main__":
