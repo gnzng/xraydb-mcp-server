@@ -751,6 +751,54 @@ def dynamical_theta_offset(
         return f"Error calculating dynamical theta offset: {str(e)}"
 
 
+@mcp.tool()
+def transmission_sample(
+    sample: "str | dict",
+    energy: float,
+    absorp_total: float = 2.6,
+    area: float = 1.0,
+    density: Optional[float] = None,
+    frac_type: str = "mass",
+) -> str:
+    """
+    Analyze transmission mode sample.
+
+    Args:
+        sample (str or dict): Chemical formula or mass fractions. One entry can be -1 for unspecified portion.
+        energy (float): X-ray energy (eV) at which transmission will be analyzed. Recommended: edge energy + 50 eV.
+        absorp_total (float): Total absorption (mu_t*d) at specified energy.
+        area (float, optional): Area (cm^2) of the sample. Default: 1 cm^2.
+        density (float, optional): Density (g/cm^3) of the sample.
+        frac_type (str, optional): 'mass' or 'molar'. Specifies type of fractions if sample is dict.
+
+    Returns:
+        str: Dictionary fields include:
+            - energy(eV): incident energy
+            - absorp_total: total absorption
+            - mass_fractions: mass fractions of elements
+            - molar_fractions: molar fractions of elements
+            - absorbance_steps: absorbance steps for each element
+            - area (cm^2): area, if specified
+            - mass_total(mg): total mass, if area specified
+            - mass_components(mg): mass of each element, if area specified
+            - density(g/cc): density, if specified
+            - thickness(mm): thickness, if area and density specified
+            - absorption_length(um): absorption length, if area and density specified
+    """
+    try:
+        result = xraydb.transmission_sample(
+            sample,
+            energy,
+            absorp_total=absorp_total,
+            area=area,
+            density=density,
+            frac_type=frac_type,
+        )
+        return str(result)
+    except Exception as e:
+        return f"Error analyzing transmission sample: {str(e)}"
+
+
 if __name__ == "__main__":
     # Run the MCP server
     mcp.run()
