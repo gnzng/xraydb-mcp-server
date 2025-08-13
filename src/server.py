@@ -468,6 +468,137 @@ def lambert_beer(mu: float, thickness: float, I0: float = 1.0) -> str:
     )
 
 
+@mcp.tool()
+def mu_elam(element: str, energy: float, kind: str = "total") -> str:
+    """
+    X-ray mass attenuation coefficient, mu/rho, for an element and energy from Elam tables.
+    Args:
+        element (str): Atomic number or symbol.
+        energy (float): Energy in eV.
+        kind (str): Type of cross-section ('total', 'photo', 'coh', 'incoh').
+    Returns:
+        str: mu/rho value in cm^2/g.
+    """
+    try:
+        value = xraydb.mu_elam(element, energy, kind=kind)
+        return (
+            f"Elam mu/rho for {element} at {energy} eV:\n"
+            f"Kind: {kind}\n"
+            f"mu/rho: {value} cm^2/g"
+        )
+    except Exception as e:
+        return f"Error retrieving Elam mu/rho: {str(e)}"
+
+
+@mcp.tool()
+def coherent_cross_section_elam(element: str, energy: float) -> str:
+    """
+    Coherent scattering cross-section for an element and energy from Elam tables.
+    Args:
+        element (str): Atomic number or symbol.
+        energy (float): Energy in eV.
+    Returns:
+        str: Coherent cross-section value in cm^2/g.
+    """
+    try:
+        value = xraydb.coherent_cross_section_elam(element, energy)
+        return (
+            f"Elam coherent scattering cross-section for {element} at {energy} eV:\n"
+            f"Value: {value} cm^2/g"
+        )
+    except Exception as e:
+        return f"Error retrieving Elam coherent cross-section: {str(e)}"
+
+
+@mcp.tool()
+def incoherent_cross_section_elam(element: str, energy: float) -> str:
+    """
+    Incoherent scattering cross-section for an element and energy from Elam tables.
+    Args:
+        element (str): Atomic number or symbol.
+        energy (float): Energy in eV.
+    Returns:
+        str: Incoherent cross-section value in cm^2/g.
+    """
+    try:
+        value = xraydb.incoherent_cross_section_elam(element, energy)
+        return (
+            f"Elam incoherent scattering cross-section for {element} at {energy} eV:\n"
+            f"Value: {value} cm^2/g"
+        )
+    except Exception as e:
+        return f"Error retrieving Elam incoherent cross-section: {str(e)}"
+
+
+@mcp.tool()
+def xray_lines(
+    element: str,
+    initial_level: str = None,
+    excitation_energy: float = None,
+) -> str:
+    """
+    Get dictionary of X-ray emission lines of an element.
+    Args:
+        element (str): Atomic symbol, name, or number for the element.
+        initial_level (str, optional): IUPAC symbol of initial level.
+        excitation_energy (float, optional): Excitation energy in eV.
+    Returns:
+        str: Formatted string with X-ray emission lines.
+    """
+    try:
+        lines = xraydb.xray_lines(
+            element,
+            initial_level=initial_level,
+            excitation_energy=excitation_energy,
+        )
+        if not lines:
+            return f"No X-ray emission lines found for {element}."
+
+        output = f"X-ray emission lines for {element}"
+        if initial_level:
+            output += f", initial level: {initial_level}"
+        if excitation_energy is not None:
+            output += f", excitation energy: {excitation_energy} eV"
+        output += ":\n\n"
+        output += (
+            "Siegbahn   Energy (eV)   Intensity      Initial Level   Final Level\n"
+        )
+        output += "-" * 65 + "\n"
+        for name, line in lines.items():
+            output += (
+                f"{name:<9} {line.energy:>10.1f} {line.intensity:>12.6f} "
+                f"{line.initial_level:>13} {line.final_level}\n"
+            )
+        return output
+    except Exception as e:
+        return f"Error retrieving X-ray emission lines: {str(e)}"
+
+
+@mcp.tool()
+def xray_line(element: str, line: str) -> str:
+    """
+    Get data for an X-ray emission line of an element, given the Siegbahn notation.
+    Args:
+        element (str): Atomic symbol, name, or number for the element.
+        line (str): Siegbahn notation for emission line (e.g., 'Ka1', 'Lb1', 'Ka', 'La').
+    Returns:
+        str: Formatted string with X-ray emission line data.
+    """
+    try:
+        result = xraydb.xray_line(element, line)
+        if result is None:
+            return f"Emission line '{line}' not found for element '{element}'."
+        return (
+            f"X-ray emission line '{line}' for {element}:\n"
+            f"  Energy:        {result.energy:.1f} eV\n"
+            f"  Intensity:     {result.intensity:.6f}\n"
+            f"  Initial level: {result.initial_level}\n"
+            f"  Final level:   {result.final_level}"
+        )
+    except Exception as e:
+        return f"Error retrieving X-ray emission line: {str(e)}"
+
+
 if __name__ == "__main__":
     # Run the MCP server
     mcp.run()
