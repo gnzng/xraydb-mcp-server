@@ -296,6 +296,120 @@ def material_mu(
 
 
 @mcp.tool()
+def chantler_energies(element: str, emin: float = 0.0, emax: float = 1e9) -> str:
+    """
+    Get energies at which Chantler data is tabulated for a particular element.
+    Args:
+        element (str): Atomic symbol, name, or number for the element.
+        emin (float): Lower bound of energies in eV (default: 0).
+        emax (float): Upper bound of energies in eV (default: 1e9).
+    Returns:
+        str: List of energies in eV as a formatted string.
+    """
+    try:
+        energies = xraydb.chantler_energies(element, emin=emin, emax=emax)
+        if energies is None or len(energies) == 0:
+            return (
+                f"No Chantler energies found for {element} in range {emin}–{emax} eV."
+            )
+        formatted = ", ".join(f"{e:.1f}" for e in energies)
+        return (
+            f"Chantler tabulated energies for {element} between {emin} and {emax} eV:\n"
+            f"{formatted}"
+        )
+    except Exception as e:
+        return f"Error retrieving Chantler energies: {str(e)}"
+
+
+@mcp.tool()
+def chantler_data(element: str, energy: float, column: str, **kwargs) -> str:
+    """
+    Get data from Chantler tables for a given element, energy, and column.
+    Args:
+        element (str): Atomic symbol, name, or number for the element.
+        energy (float): Energy in eV.
+        column (str): Data column to return ('f1', 'f2', 'mu_photo', 'mu_incoh', 'mu_total').
+        **kwargs: Additional keyword arguments for the underlying function.
+    Returns:
+        str: Chantler data value as a formatted string.
+    """
+    try:
+        value = xraydb.chantler_data(element, energy, column, **kwargs)
+        return (
+            f"Chantler data for {element} at {energy} eV:\n"
+            f"Column: {column}\n"
+            f"Value: {value}"
+        )
+    except Exception as e:
+        return f"Error retrieving Chantler data: {str(e)}"
+
+
+@mcp.tool()
+def f1_chantler(element: str, energy: float, **kwargs) -> str:
+    """
+    Real part of anomalous x-ray scattering factor (f1) from Chantler tables.
+    Args:
+        element (str): Atomic symbol, name, or number for the element.
+        energy (float): Energy in eV.
+        **kwargs: Additional keyword arguments for the underlying function.
+    Returns:
+        str: f1 value as a formatted string.
+    """
+    try:
+        value = xraydb.f1_chantler(element, energy, **kwargs)
+        return (
+            f"Chantler f1 (real part) for {element} at {energy} eV:\n" f"Value: {value}"
+        )
+    except Exception as e:
+        return f"Error retrieving Chantler f1: {str(e)}"
+
+
+@mcp.tool()
+def f2_chantler(element: str, energy: float) -> str:
+    """
+    Imaginary part of anomalous x-ray scattering factor (f2) from Chantler tables.
+    Args:
+        element (str): Atomic symbol, name, or number for the element.
+        energy (float): Energy in eV.
+    Returns:
+        str: f2 value as a formatted string.
+    """
+    try:
+        value = xraydb.f2_chantler(element, energy)
+        return (
+            f"Chantler f2 (imaginary part) for {element} at {energy} eV:\n"
+            f"Value: {value}"
+        )
+    except Exception as e:
+        return f"Error retrieving Chantler f2: {str(e)}"
+
+
+@mcp.tool()
+def mu_chantler(
+    element: str, energy: float, incoh: bool = False, photo: bool = False
+) -> str:
+    """
+    X-ray mass attenuation coefficient (mu/rho) from Chantler tables.
+    Args:
+        element (str): Atomic symbol, name, or number for the element.
+        energy (float): Energy in eV.
+        incoh (bool): Return only incoherent contribution (default: False).
+        photo (bool): Return only photo-electric contribution (default: False).
+    Returns:
+        str: mu/rho value as a formatted string.
+    """
+    try:
+        value = xraydb.mu_chantler(element, energy, incoh=incoh, photo=photo)
+        return (
+            f"Chantler mu/rho for {element} at {energy} eV:\n"
+            f"incoh: {incoh}, photo: {photo}\n"
+            f"mu/rho: {value} cm^2/g"
+        )
+    except Exception as e:
+        return f"Error retrieving Chantler mu/rho: {str(e)}"
+
+
+@mcp.tool()
 def lambert_beer(mu: float, thickness: float, I0: float = 1.0) -> str:
     """
     Calculate X-ray transmission using the Lambert-Beer law: I = I0 * exp(-mu * thickness).
