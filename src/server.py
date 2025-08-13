@@ -618,7 +618,7 @@ def coated_reflectivity(
     output: str = "intensity",
 ) -> str:
     """
-    Reflectivity for a coated mirror.
+    Calculate reflectivity for a coated mirror using xraydb.coated_reflectivity.
     Args:
         coating (str): Coating material name or formula.
         coating_thick (float): Thickness of coating in Angstroms.
@@ -638,37 +638,36 @@ def coated_reflectivity(
         str: Mirror reflectivity calculation results.
     """
     try:
-        if coating_thick is None:
-            raise ValueError("Please provide thickness of the coating in Angstroms")
-
-        stackup = [coating]
-        thickness = [coating_thick]
-        dens = coating_dens
-
-        if binder is not None:
-            if binder_thick is None:
-                raise ValueError(
-                    "Please provide thickness of binding layer in Angstroms"
-                )
-            stackup.append(binder)
-            thickness.append(binder_thick)
-            if binder_dens is not None:
-                dens = [coating_dens, binder_dens]
-
-        result = multilayer_reflectivity(
-            stackup,
-            thickness,
-            substrate,
-            theta,
-            energy,
-            density=dens,
-            substrate_density=substrate_dens,
-            substrate_rough=substrate_roughness,
-            surface_rough=surface_roughness,
+        reflectivity = xraydb.coated_reflectivity(
+            coating=coating,
+            coating_thick=coating_thick,
+            substrate=substrate,
+            theta=theta,
+            energy=energy,
+            coating_dens=coating_dens,
+            surface_roughness=surface_roughness,
+            substrate_dens=substrate_dens,
+            substrate_roughness=substrate_roughness,
+            binder=binder,
+            binder_thick=binder_thick,
+            binder_dens=binder_dens,
             polarization=polarization,
             output=output,
         )
-        return result
+        result_type = "Intensity" if output == "intensity" else "Complex amplitude"
+        return (
+            f"Coated mirror reflectivity for {coating} (thickness={coating_thick} Å)"
+            f"{' with binder ' + binder if binder else ''} on substrate {substrate}:\n"
+            f"Theta: {theta} rad\n"
+            f"Energy: {energy} eV\n"
+            f"Coating density: {coating_dens if coating_dens is not None else 'default'} g/cm^3\n"
+            f"Surface roughness: {surface_roughness} Å\n"
+            f"Substrate density: {substrate_dens if substrate_dens is not None else 'default'} g/cm^3\n"
+            f"Substrate roughness: {substrate_roughness} Å\n"
+            f"Polarization: {polarization}\n"
+            f"Output type: {result_type}\n"
+            f"Reflectivity: {reflectivity}"
+        )
     except Exception as e:
         return f"Error calculating coated mirror reflectivity: {str(e)}"
 
