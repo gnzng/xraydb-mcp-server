@@ -799,6 +799,53 @@ def transmission_sample(
         return f"Error analyzing transmission sample: {str(e)}"
 
 
+@mcp.tool()
+def formula_to_mass_fracs(formula: "str | dict") -> dict:
+    """
+    Calculate mass fractions of elements from a given molecular formula.
+
+    Args:
+        formula (str or dict): Chemical formula.
+
+    Returns:
+        dict: Fields of each element and values of their mass fractions.
+    """
+    return xraydb.formula_to_mass_fracs(formula)
+
+
+@mcp.tool()
+def mass_fracs_to_molar_fracs(mass_fracs: dict) -> dict:
+    """
+    Calculate molar fractions from a given mass fractions of elements.
+    Result is normalized to one.
+
+    Args:
+        mass_fracs (dict): Mass fractions of elements.
+
+    Returns:
+        dict: Fields of each element and values of their coefficients.
+    """
+    return xraydb.mass_fracs_to_molar_fracs(mass_fracs)
+
+
+@mcp.tool()
+def validate_mass_fracs(mass_fracs: dict) -> dict:
+    """
+    Validate mass fractions. Either verify they sum to one, or calculate
+    the remaining portion of a compound/element with value specified as -1.
+
+    Additionally, compounds specified in mass_fracs will be separated to the
+    individual elements.
+
+    Args:
+        mass_fracs (dict): Mass fractions of elements.
+
+    Returns:
+        dict: Validated and simplified mass fractions.
+    """
+    return xraydb._validate_mass_fracs(mass_fracs)
+
+
 if __name__ == "__main__":
     # Run the MCP server
     mcp.run()
