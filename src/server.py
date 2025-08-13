@@ -322,6 +322,44 @@ def chantler_energies(element: str, emin: float = 0.0, emax: float = 1e9) -> str
 
 
 @mcp.tool()
+def f0(ion: str, q: float) -> str:
+    """
+    Elastic X-ray scattering factor, f0(q), for an ion.
+    Args:
+        ion (str): Atomic number, symbol, or ionic symbol (e.g., 'Fe', 'Fe2+').
+        q (float): Q value for scattering, q = sin(theta) / lambda, where theta=incident angle, lambda=X-ray wavelength in meters.
+    Returns:
+        str: Scattering factor for the given ion and Q value.
+    """
+    try:
+        value = xraydb.f0(ion, q)
+        return f"Elastic X-ray scattering factor f0 for ion '{ion}' at q={q}:\nValue: {value}"
+    except Exception as e:
+        return f"Error calculating f0: {str(e)}"
+
+
+@mcp.tool()
+def f0_ions(element: str = None) -> str:
+    """
+    List ion names supported in the f0() calculation.
+    Args:
+        element (str, optional): Element symbol, name, or atomic number. If None, returns all ions.
+    Returns:
+        str: List of supported ion names.
+    """
+    try:
+        ions = xraydb.f0_ions(element=element)
+        if not ions:
+            return f"No ions found for element '{element}'."
+        return (
+            f"Supported ions for element '{element if element else 'all'}':\n"
+            + ", ".join(ions)
+        )
+    except Exception as e:
+        return f"Error retrieving f0 ions: {str(e)}"
+
+
+@mcp.tool()
 def chantler_data(element: str, energy: float, column: str, **kwargs) -> str:
     """
     Get data from Chantler tables for a given element, energy, and column.
