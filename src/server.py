@@ -342,7 +342,7 @@ def f0(ion: str, q: float) -> str:
 @mcp.tool()
 def f0_ions(element: str = None) -> str:
     """
-    List ion names supported in the f0() calculation.
+    List ion names supported in the f0() calculation. Elastic X-ray scattering factor, f0(q), for an ion.
     Args:
         element (str, optional): Element symbol, name, or atomic number. If None, returns all ions.
     Returns:
