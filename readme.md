@@ -5,6 +5,12 @@ Cool is that this repo/server has only 2 `pip` installable dependencies:
 - `mcp` for the protocol
 - `xraydb` for the tool usage
 
+If you start the server using the `startup.bat` or `startup.sh` scripts, make sure the script is executable. Make the script executable (if needed) and run it for Linux or MacOS:
+```sh
+chmod +x startup.sh
+```
+
+
 So far implemented:
 
 1. `xray_edges` – Get X-ray absorption edges for an element.
