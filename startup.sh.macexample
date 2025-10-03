@@ -1,0 +1,14 @@
+# startup script to launch the MCP server on macOS in a virtual environment
+
+# navigate to the project directory
+cd /Users/admin/software/mcp/xraydb-mcp-server
+
+# make the server script executable
+chmod +x src/server.py
+
+# activate the virtual environment if needed
+if [ -f ".venv/bin/activate" ]; then
+    source .venv/bin/activate
+fi
+# Start the MCP server
+uv run src/server.py
