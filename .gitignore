@@ -1,5 +1,6 @@
 # .gitignore for xraydb-mcp-server
 startup.sh
+startup.bat
 
 # Python typical ignores
 __pycache__/

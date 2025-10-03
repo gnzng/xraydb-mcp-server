@@ -1,0 +1,6 @@
+:: startup.bat for server running on windows
+@echo off
+:: navigate to the server directory
+cd /d "C:\Users\admin\mcp-servers\bcsz-mcp"
+:: activate the virtual environment
+uv run python src\server.py
