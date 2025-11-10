@@ -1,3 +1,5 @@
+[![MSeeP.ai Security Assessment Badge](https://mseep.net/pr/gnzng-xraydb-mcp-server-badge.png)](https://mseep.ai/app/gnzng-xraydb-mcp-server)
+
 # XrayDB MCP Server
 Prototype of a Model Context Protocol (MCP) server that provides access to X-ray properties of elements via the [XrayDB](https://github.com/xraypy/XrayDB) library.
 
