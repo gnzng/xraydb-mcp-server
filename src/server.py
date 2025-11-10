@@ -432,43 +432,38 @@ def mu_elam(element: str, energy: float, kind: str = "total") -> str:
 
 
 @mcp.tool()
-def coherent_cross_section_elam(element: str, energy: float) -> str:
+def elam_cross_section(element: str, energy: float, cross_section_type: str) -> str:
     """
-    Coherent scattering cross-section for an element and energy from Elam tables.
+    Get coherent or incoherent scattering cross-section from Elam tables for a given element and energy.
+
     Args:
         element (str): Atomic number or symbol.
         energy (float): Energy in eV.
+        cross_section_type (str): Type of cross-section to retrieve ('coherent' or 'incoherent').
+
     Returns:
-        str: Coherent cross-section value in cm^2/g.
+        str: Cross-section value in cm^2/g as a formatted string.
     """
     try:
-        value = xraydb.coherent_cross_section_elam(element, energy)
-        return (
-            f"Elam coherent scattering cross-section for {element} at {energy} eV:\n"
-            f"Value: {value} cm^2/g"
-        )
-    except Exception as e:
-        return f"Error retrieving Elam coherent cross-section: {str(e)}"
+        if cross_section_type == "coherent":
+            value = xraydb.coherent_cross_section_elam(element, energy)
+            return (
+                f"Elam coherent scattering cross-section for {element} at {energy} eV:\n"
+                f"Value: {value} cm^2/g"
+            )
 
+        elif cross_section_type == "incoherent":
+            value = xraydb.incoherent_cross_section_elam(element, energy)
+            return (
+                f"Elam incoherent scattering cross-section for {element} at {energy} eV:\n"
+                f"Value: {value} cm^2/g"
+            )
 
-@mcp.tool()
-def incoherent_cross_section_elam(element: str, energy: float) -> str:
-    """
-    Incoherent scattering cross-section for an element and energy from Elam tables.
-    Args:
-        element (str): Atomic number or symbol.
-        energy (float): Energy in eV.
-    Returns:
-        str: Incoherent cross-section value in cm^2/g.
-    """
-    try:
-        value = xraydb.incoherent_cross_section_elam(element, energy)
-        return (
-            f"Elam incoherent scattering cross-section for {element} at {energy} eV:\n"
-            f"Value: {value} cm^2/g"
-        )
+        else:
+            return "Invalid cross-section type specified. Please use 'coherent' or 'incoherent'."
+
     except Exception as e:
-        return f"Error retrieving Elam incoherent cross-section: {str(e)}"
+        return f"Error retrieving Elam cross-section: {str(e)}"
 
 
 @mcp.tool()
