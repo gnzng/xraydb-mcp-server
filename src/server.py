@@ -86,41 +86,34 @@ def guess_edge(
 
 
 @mcp.tool()
-def atomic_number(element: str) -> str:
+def atomic_info(element: str, info_type: str) -> str:
     """
-    Return the atomic number Z for an element.
+    Return either the atomic number or atomic density for an element.
+
     Args:
         element (str): Element symbol (e.g., 'Fe', 'Cu') or name.
+        info_type (str): Type of information to retrieve ('number' for atomic number, 'density' for atomic density).
+
     Returns:
-        str: Atomic number information.
+        str: Requested atomic information.
     """
     if not element:
         raise ValueError("Missing element parameter")
 
-    atomic_num = xraydb.atomic_number(element)
-    if atomic_num is None:
-        return f"Unknown element: {element}"
+    if info_type == "number":
+        atomic_num = xraydb.atomic_number(element)
+        if atomic_num is None:
+            return f"Unknown element: {element}"
+        return f"Atomic number of {element.capitalize()} is {atomic_num}."
 
-    return f"Atomic number of {element.capitalize()} is {atomic_num}."
+    elif info_type == "density":
+        density = xraydb.atomic_density(element)
+        if density is None:
+            return f"Unknown element: {element}"
+        return f"Atomic density of {element.capitalize()} is {density:.2f} g/cm^3."
 
-
-@mcp.tool()
-def atomic_density(element: str) -> str:
-    """
-    Return the atomic density (gr/cm^3) for an element.
-    Args:
-        element (str): Element symbol (e.g., 'Fe', 'Cu') or name.
-    Returns:
-        str: Atomic density information.
-    """
-    if not element:
-        raise ValueError("Missing element parameter")
-
-    density = xraydb.atomic_density(element)
-    if density is None:
-        return f"Unknown element: {element}"
-
-    return f"Atomic density of {element.capitalize()} is {density:.2f} g/cm^3."
+    else:
+        return "Invalid info_type specified. Please use 'number' or 'density'."
 
 
 @mcp.tool()
