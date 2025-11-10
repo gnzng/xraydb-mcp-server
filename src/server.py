@@ -11,49 +11,43 @@ mcp = FastMCP("xraydb-server")
 
 
 @mcp.tool()
-def xray_edges(element: str) -> str:
+def xray_absorption_edges(element: str, edge: str = None) -> str:
     """
-    Get X-ray absorption edges for an element.
+    Get X-ray absorption edges for an element or data for a specific X-ray absorption edge.
+
     Args:
         element (str): Element symbol (e.g., 'Fe', 'Cu') or name.
+        edge (str, optional): IUPAC symbol for the edge (e.g., 'K', 'L3'). If None, returns all edges.
+
     Returns:
-        str: Formatted string with X-ray absorption edges information.
+        str: Formatted string with X-ray absorption edge information.
     """
     try:
-        edges = xraydb.xray_edges(element)
-        if not edges:
-            return f"No X-ray absorption edge data found for {element}."
+        if edge is None:
+            edges = xraydb.xray_edges(element)
+            if not edges:
+                return f"No X-ray absorption edge data found for {element}."
 
-        formatted_output = f"X-ray absorption edges for {element}:\n\n"
-        formatted_output += "Edge    Energy (eV)    Fluorescence Yield    Jump Ratio\n"
-        formatted_output += "-" * 55 + "\n"
-        for edge_name, edge_data in edges.items():
-            formatted_output += f"{edge_name:<6} {edge_data.energy:>10.1f} {edge_data.fyield:>18.6f} {edge_data.jump_ratio:>12.3f}\n"
-        return formatted_output
-    except ValueError as e:
-        return str(e)
+            formatted_output = f"X-ray absorption edges for {element}:\n\n"
+            formatted_output += (
+                "Edge    Energy (eV)    Fluorescence Yield    Jump Ratio\n"
+            )
+            formatted_output += "-" * 55 + "\n"
+            for edge_name, edge_data in edges.items():
+                formatted_output += f"{edge_name:<6} {edge_data.energy:>10.1f} {edge_data.fyield:>18.6f} {edge_data.jump_ratio:>12.3f}\n"
+            return formatted_output
 
+        else:
+            edge_data = xraydb.xray_edge(element, edge)
+            if edge_data is None:
+                return f"Edge '{edge.upper()}' not found for element '{element}'."
 
-@mcp.tool()
-def xray_edge(element: str, edge: str) -> str:
-    """
-    Get data for a specific X-ray absorption edge.
-    Args:
-        element (str): Element symbol (e.g., 'Fe', 'Cu') or name.
-        edge (str): IUPAC symbol for the edge (e.g., 'K', 'L3').
-    Returns:
-        str: Formatted string with the specific X-ray edge information.
-    """
-    try:
-        edge_data = xraydb.xray_edge(element, edge)
-        if edge_data is None:
-            return f"Edge '{edge.upper()}' not found for element '{element}'."
+            output = f"X-ray Edge Data for {element}, {edge.upper()} edge:\n"
+            output += f"  Absorption Edge Energy: {edge_data.energy:.1f} eV\n"
+            output += f"  Fluorescence Yield:     {edge_data.fyield:.6f}\n"
+            output += f"  Jump Ratio:             {edge_data.jump_ratio:.3f}"
+            return output
 
-        output = f"X-ray Edge Data for {element}, {edge.upper()} edge:\n"
-        output += f"  Absorption Edge Energy: {edge_data.energy:.1f} eV\n"
-        output += f"  Fluorescence Yield:     {edge_data.fyield:.6f}\n"
-        output += f"  Jump Ratio:             {edge_data.jump_ratio:.3f}"
-        return output
     except ValueError as e:
         return str(e)
 
