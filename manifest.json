@@ -2,7 +2,7 @@
   "manifest_version": "0.2",
   "name": "xraydb-mcp-server",
   "display_name": "XrayDB MCP Server",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "MCP server providing X-ray properties of elements via XrayDB.",
   "long_description": "Exposes the XrayDB library (https://github.com/xraypy/XrayDB) as MCP tools: X-ray absorption edges, emission lines, scattering factors, attenuation, mirror reflectivity, ion chamber fluxes, and more.",
   "author": {
