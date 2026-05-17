@@ -1,0 +1,39 @@
+{
+  "manifest_version": "0.2",
+  "name": "xraydb-mcp-server",
+  "display_name": "XrayDB MCP Server",
+  "version": "0.1.1",
+  "description": "MCP server providing X-ray properties of elements via XrayDB.",
+  "long_description": "Exposes the XrayDB library (https://github.com/xraypy/XrayDB) as MCP tools: X-ray absorption edges, emission lines, scattering factors, attenuation, mirror reflectivity, ion chamber fluxes, and more.",
+  "author": {
+    "name": "gnzng",
+    "email": "damian@guenzing.de",
+    "url": "https://github.com/gnzng"
+  },
+  "homepage": "https://github.com/gnzng/xraydb-mcp-server",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gnzng/xraydb-mcp-server"
+  },
+  "keywords": ["xray", "physics", "chemistry", "synchrotron", "xraydb"],
+  "server": {
+    "type": "python",
+    "entry_point": "src/server.py",
+    "mcp_config": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--with", "mcp",
+        "--with", "xraydb",
+        "${__dirname}/src/server.py"
+      ]
+    }
+  },
+  "compatibility": {
+    "claude_desktop": ">=0.10.0",
+    "platforms": ["darwin", "linux", "win32"],
+    "runtimes": {
+      "python": ">=3.10"
+    }
+  }
+}

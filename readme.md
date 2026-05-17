@@ -3,7 +3,17 @@ Prototype of a Model Context Protocol (MCP) server that provides access to X-ray
 
 # Installation
 
-## Using [uv](https://github.com/astral-sh/uv)
+## Claude Desktop (one-click via `.mcpb`)
+
+Prerequisite: [uv](https://github.com/astral-sh/uv) must be installed and on your `PATH`.
+
+1. Download `xraydb-mcp-server.mcpb` from the [Releases page](https://github.com/gnzng/xraydb-mcp-server/releases) (or build it locally with `./build-mcpb.sh`).
+2. Double-click the file — Claude Desktop will prompt to install it.
+3. On first launch, `uv run` will resolve `mcp` and `xraydb` on the fly; no virtualenv setup needed.
+
+## Manual install (any MCP client)
+
+### Using [uv](https://github.com/astral-sh/uv)
 
 Cool is that this repo/server has only 2 `pip` installable dependencies:
 - `mcp` for the protocol

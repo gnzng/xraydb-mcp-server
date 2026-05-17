@@ -2,6 +2,9 @@
 startup.sh
 startup.bat
 
+# Built MCPB bundle (produced by build-mcpb.sh, attached to GitHub releases)
+*.mcpb
+
 # Python typical ignores
 __pycache__/
 *.py[cod]
